@@ -2,41 +2,25 @@
 
 public class Obj
 {
-    static class Points
-    {
-        /// <summary>
-        /// Punti per ogni obiettivo (Messi a cazzo, da correggere)
-        /// </summary>
-        public const int Primario = 1000;
-        public const int Secondario = 500;
-        public const int Terziario = 200;
-        public const int DifesaNoPrimario = 100;
-        public const int Difesa = 100;
-        public const int Incursori = -100;
-        public const int Highlander = -500;
-    }
-
     /// <summary>
     /// Id dell'obiettivo
     /// </summary>
     public int Id { get; set; }
     public string Description { get; set; } = "";
 
-    /// <summary>
-    /// Obiettivo primario, secondario o terziario
-    /// </summary>
-    public bool Primario { set; get; }
-    public bool Secondario { set; get; }
-    public bool Terziario { set; get; }
-
+    public Task Primario { set; get; }
+    public Task Secondario { set; get; }
+    public Task Terziario { set; get; }
+    public Task DifesaNoPrimario { set; get; }
     /// <summary>
     /// Caduti della difesa
     /// </summary>
-    public int Difesa { get; set; }
+    public Task Difesa { get; set; }
     /// <summary>
     /// Caduti dell'attacco
     /// </summary>
-    public int Incursori { get; set; }
+    public Task Incursori { get; set; }
+    public Task Highlander { get; set; }
 
     /// <summary>
     /// Tempi di obiettivo
@@ -45,8 +29,55 @@ public class Obj
     public DateTime Fine { get; set; }
     public TimeSpan Durata { get; set; }
 
-    public int Highlander { get; set; }
     public String Contestazioni { get; set; } = "";
+
+    public Obj()
+    {
+        Primario = new Task()
+        {
+            Description = "Obiettivo Primario",
+            Points = Points.Primario,
+            Notes = ""
+        };
+        Secondario = new Task()
+        {
+            Description = "Obiettivo Secondario",
+            Points = Points.Secondario,
+            Notes = ""
+        };
+        Terziario = new Task()
+        {
+            Description = "Obiettivo Terziario",
+            Points = Points.Terziario,
+            Notes = ""
+        };
+        Difesa = new Task()
+        {
+            Description = "Difensori eliminati",
+            Points = Points.Difensori,
+            Range = (0,3),
+            Notes = ""
+        };
+        DifesaNoPrimario = new Task()
+        {
+            Description = "Eliminazione completa della difesa e mancato completamento dell'obiettivo primario",
+            Points = Points.DifesaNoPrimario,
+            Notes = ""
+        };
+        Incursori = new Task()
+        {
+            Description = "Incursori eliminati",
+            Points = Points.Incursori,
+            Range = (0, 6),
+            Notes = ""
+        };
+        Highlander = new Task()
+        {
+            Description = "Incursori highlander",
+            Points = Points.Highlander,
+            Notes = ""
+        };
+    }
 
     public int TotalPoints
     {
@@ -54,16 +85,19 @@ public class Obj
         {
             int sum = 0;
 
-            if (Primario) sum += Points.Primario;
-            if (Secondario) sum += Points.Secondario;
-            if (Terziario) sum += Points.Terziario;
+            sum += Primario.EarnedPoints;
+            sum += Secondario.EarnedPoints;
+            sum += Terziario.EarnedPoints;
+            sum += Difesa.EarnedPoints;
 
-            if (Difesa <= 3) sum += Points.Difesa * Difesa;
-            if (Difesa == 3 && !Primario) sum += Points.DifesaNoPrimario;
+            if (!(Primario.Result > Primario.Range.Min)
+                && (Difesa.Result == Difesa.Range.Max))
+                sum += DifesaNoPrimario.Result = 1;
 
-            if (Incursori <= 6) sum += Points.Incursori * Incursori;
+            sum += DifesaNoPrimario.EarnedPoints;
+            sum += Incursori.EarnedPoints;
+            sum += Highlander.EarnedPoints;
 
-            
             return sum;
         }
     }
